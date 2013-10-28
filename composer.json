@@ -1,0 +1,29 @@
+{
+    "name": "neam/yii-relational-graph-db",
+    "description": "Ability to relate any items within a relational database with each other, using the concept of nodes and edges.",
+    "keywords": ["yii"],
+    "homepage": "https://github.com/neam/yii-relational-graph-db",
+    "type": "yii-extension",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fredrik Wollsén",
+            "email": "fredrik@neam.se"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://packages.phundament.com"
+        }
+    ],
+    "autoload": {
+        "classmap": ["behaviors/"]
+    },    
+    "require": {
+        "php": ">=5.0.0",
+        "yiisoft/yii": ">=1.1.0"
+    },
+    "require-dev": {
+    }
+}
