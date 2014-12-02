@@ -116,11 +116,8 @@ class RelatedNodesBehavior extends CActiveRecordBehavior
 
         $this->deleteEdgeDiff($futureOutEdgesNodeIds, $relationName);
 
-        // TODO: fetch weights properly when they are implemented in form
-
-        $weight = 0;
-        foreach ($futureOutEdgesNodeIds as $toNodeId) {
-            $this->addEdge($node->id, $toNodeId, $relationName, $weight++);
+        foreach ($futureOutEdgesNodeIds as $weight => $toNodeId) {
+            $this->addEdge($node->id, $toNodeId, $relationName, $weight);
         }
 
     }
