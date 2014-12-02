@@ -41,6 +41,41 @@ class RelatedNodesBehavior extends CActiveRecordBehavior
 
     }
 
+    public function relationalGraphDbRelation($relationName, $modelClass)
+    {
+        return array(
+            $relationName => array(
+                self::HAS_MANY,
+                $modelClass,
+                array('id' => 'node_id'),
+                'through' => 'outNodes',
+                'condition' => 'relation = :relation',
+                'order' => 'outEdges.weight ASC',
+                'params' => array(
+                    ':relation' => $relationName,
+                ),
+            )
+        );
+    }
+
+    public function relationalGraphDbRelatedOutNodes()
+    {
+        $relationName = 'related';
+        return array(
+            $relationName => array(
+                CActiveRecord::HAS_MANY,
+                'Node',
+                array('id' => 'id'),
+                'through' => 'outNodes',
+                'condition' => 'relation=:relation',
+                'order' => 'outEdges.weight ASC',
+                'params' => array(
+                    ':relation' => $relationName
+                ),
+            )
+        );
+    }
+
     /**
      * Handles node id arrays sent in post data with the relation name as array key. Example:
      *
@@ -116,11 +151,8 @@ class RelatedNodesBehavior extends CActiveRecordBehavior
 
         $this->deleteEdgeDiff($futureOutEdgesNodeIds, $relationName);
 
-        // TODO: fetch weights properly when they are implemented in form
-
-        $weight = 0;
-        foreach ($futureOutEdgesNodeIds as $toNodeId) {
-            $this->addEdge($node->id, $toNodeId, $relationName, $weight++);
+        foreach ($futureOutEdgesNodeIds as $weight => $toNodeId) {
+            $this->addEdge($node->id, $toNodeId, $relationName, $weight);
         }
 
     }
@@ -153,12 +185,12 @@ class RelatedNodesBehavior extends CActiveRecordBehavior
         return Edge::model()->deleteAll($criteria);
     }
 
-    protected function addEdge($fromNodeId, $toNodeId, $relation, $weight = null)
+    protected function addEdge($fromNodeId, $toNodeId, $relationName, $weight = null)
     {
         $edge = Edge::model()->findByAttributes(array(
             'from_node_id' => $fromNodeId,
             'to_node_id' => $toNodeId,
-            'relation' => $relation,
+            'relation' => $relationName,
         ));
 
         // Nothing has changed
@@ -172,7 +204,7 @@ class RelatedNodesBehavior extends CActiveRecordBehavior
 
         $edge->from_node_id = $fromNodeId;
         $edge->to_node_id = $toNodeId;
-        $edge->relation = $relation;
+        $edge->relation = $relationName;
 
         if ($weight !== null) {
             $edge->weight = $weight;
@@ -185,14 +217,14 @@ class RelatedNodesBehavior extends CActiveRecordBehavior
     }
 
     /**
-     * @param string $relation name of the relation
+     * @param string $relationName name of the relation
      * @param string $idColumn the column which values are collected from the related items
      * @return array
      */
-    public function getRelatedModelColumnValues($relation, $idColumn)
+    public function getRelatedModelColumnValues($relationName, $idColumn)
     {
         $ids = array();
-        foreach ($this->owner->{$relation} as $related) {
+        foreach ($this->owner->{$relationName} as $related) {
             $ids[] = $related->{$idColumn};
         }
         return $ids;
