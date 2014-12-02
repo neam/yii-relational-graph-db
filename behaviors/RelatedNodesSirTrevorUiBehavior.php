@@ -88,7 +88,6 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
 
     }
 
-
     /**
      * Make temporary sir-trevor ui attributes readable
      */
@@ -125,30 +124,6 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
         $json = json_encode($sirTrevorData);
         return $json;
 
-        var_dump($sirTrevorData, $json, __LINE__);
-        die();
-
-        return '{
-    "data": [
-        {
-            "type": "composition",
-            "data": {
-                "node_id": 1205,
-                "item_type": "composition"
-            }
-        },
-        {
-            "type": "composition",
-            "data": {
-                "node_id": 1239,
-                "item_type": "composition"
-            }
-        }
-    ]
-}';
-
-        return "{}";
-
     }
 
     /**
@@ -156,7 +131,6 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
      */
     public function __set($name, $value)
     {
-        \neam\util\U::inspection(__METHOD__, $this->handlesProperty($name));
         if (!$this->handlesProperty($name)) {
             return parent::__set($name, $value);
         }
@@ -182,46 +156,6 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
 
         return true;
 
-    }
-
-    /**
-     * Reconstruct the
-     */
-    public function afterFind($event)
-    {
-        return;
-        foreach ($this->attributes as $attribute => $config) {
-            $this->_toSave[$attribute] = json_encode($this->toData($config));
-        }
-        //var_dump($event);
-        //die("afterFind asdfasfasfd");
-    }
-
-    protected function toData($config)
-    {
-        $relation = $config["relation"];
-        $ordered = $config["ordered"];
-        foreach ($this->owner->{$relation} as $relatedItem) {
-
-        }
-        return array("foo" => "bar");
-    }
-
-    protected function setData($stJson)
-    {
-        /*
-        $relation = $config["relation"];
-        $ordered = $config["ordered"];
-        foreach ($this->owner->{$relation}) {
-
-        }
-        */
-        // TODO - Save edges...? or more general hmm. $stJson
-    }
-
-    protected function getRelatedItems()
-    {
-        die("afterFind asdfasfasfd");
     }
 
 }
