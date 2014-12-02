@@ -15,16 +15,27 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
         "related" => array(
             "ordered" => true,
             "relation" => "related",
-        ));
+        )
+    );
 
-    protected $_st_attributes = array();
+    protected $_toSave = array();
 
     public function init()
     {
         foreach ($this->attributes as $attribute => $config) {
-            $this->_st_attributes[$attribute] = null;
+            $this->_toSave[$attribute] = null;
         }
         return parent::init();
+    }
+
+    public function virtualToActualAttribute($name)
+    {
+        return str_replace("sir_trevor_ui_", "", $name);
+    }
+
+    public function actualToVirtualAttribute($attribute)
+    {
+        return "sir_trevor_ui_" . $attribute;
     }
 
     /**
@@ -32,7 +43,7 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
      */
     public function canGetProperty($name)
     {
-        return $this->handlesProperty($name, "get");
+        return $this->handlesProperty($name);
     }
 
     /**
@@ -40,7 +51,7 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
      */
     public function canSetProperty($name)
     {
-        return $this->handlesProperty($name, "set");
+        return $this->handlesProperty($name);
     }
 
     /**
@@ -48,9 +59,9 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
      * @param string $name
      * @return bool
      */
-    protected function handlesProperty($name, $check = "get")
+    protected function handlesProperty($name)
     {
-        if (in_array(str_replace("sir_trevor_ui_", "", $name), array_keys($this->attributes))) {
+        if (in_array($this->virtualToActualAttribute($name), array_keys($this->attributes))) {
             return true;
         }
     }
@@ -72,7 +83,7 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
         $validators = $owner->getValidatorList();
 
         foreach ($this->attributes as $attribute => $config) {
-            $validators->add(CValidator::createValidator('safe', $owner, "sir_trevor_ui_" . $attribute, array()));
+            $validators->add(CValidator::createValidator('safe', $owner, $this->actualTovirtualAttribute($attribute), array()));
         }
 
     }
@@ -87,6 +98,35 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
         if (!$this->handlesProperty($name)) {
             return parent::__get($name);
         }
+
+        $sirTrevorData = array("data" => array());
+
+        $relationAttribute = $this->virtualToActualAttribute($name);
+
+        if (count($this->owner->$relationAttribute) > 0) {
+
+            $qaModels = DataModel::qaModels();
+
+            foreach ($this->owner->$relationAttribute as $node) {
+                $to_node_id = $node->id;
+                $item = $node->item();
+                $table = $qaModels[get_class($item)];
+                $sirTrevorData["data"][] = array(
+                    "type" => "$table",
+                    "data" => array(
+                        "node_id" => $to_node_id,
+                        "item_type" => "$table",
+                    ),
+                );
+            }
+
+        }
+
+        $json = json_encode($sirTrevorData);
+        return $json;
+
+        var_dump($sirTrevorData, $json, __LINE__);
+        die();
 
         return '{
     "data": [
@@ -116,23 +156,32 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
      */
     public function __set($name, $value)
     {
-
+        \neam\util\U::inspection(__METHOD__, $this->handlesProperty($name));
         if (!$this->handlesProperty($name)) {
             return parent::__set($name, $value);
         }
-
-        var_dump(__LINE__, $name, $value);
-        die();
-
-        //
-
+        $this->_toSave[$name] = $value;
     }
-
 
     public function beforeSave($event)
     {
 
-        //die("beforeSave asdfasfasfd");
+        foreach ($this->_toSave as $name => $value) {
+
+            $futureOutEdgesNodeIds = array();
+            $sirTrevorData = json_decode($value);
+
+            foreach ($sirTrevorData->data as $block) {
+                $futureOutEdgesNodeIds[] = $block->data->node_id;
+            }
+
+            $this->owner->setOutEdges($futureOutEdgesNodeIds, $this->virtualToActualAttribute($name));
+
+            unset($this->_toSave[$name]);
+        }
+
+        return true;
+
     }
 
     /**
@@ -142,7 +191,7 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
     {
         return;
         foreach ($this->attributes as $attribute => $config) {
-            $this->_st_attributes[$attribute] = json_encode($this->toData($config));
+            $this->_toSave[$attribute] = json_encode($this->toData($config));
         }
         //var_dump($event);
         //die("afterFind asdfasfasfd");
