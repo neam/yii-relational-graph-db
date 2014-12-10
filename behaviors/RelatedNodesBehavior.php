@@ -4,7 +4,7 @@
  * RelatedNodesBehavior
  *
  * @uses CActiveRecordBehavior
- * @license MIT
+ * @license BSD-3-Clause
  * @author See https://github.com/neam/yii-relational-graph-db/graphs/contributors
  */
 class RelatedNodesBehavior extends CActiveRecordBehavior

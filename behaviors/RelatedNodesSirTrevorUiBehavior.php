@@ -7,6 +7,10 @@
  * to use together with CompositionWidget (TODO: Rename to SirTrevorWithCustomBlocksWidget?)
  *
  * Class RelatedNodesSirTrevorUiBehavior
+ *
+ * @uses CActiveRecordBehavior
+ * @license BSD-3-Clause
+ * @author See https://github.com/neam/yii-relational-graph-db/graphs/contributors
  */
 class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
 {
