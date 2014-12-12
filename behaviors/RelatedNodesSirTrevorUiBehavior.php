@@ -146,16 +146,15 @@ class RelatedNodesSirTrevorUiBehavior extends CActiveRecordBehavior
 
         foreach ($this->_toSave as $name => $value) {
 
-            if (empty($value)) {
-                Yii::log("$name was empty so no attempt to save related items will be made", 'info', __METHOD__);
-                continue;
-            }
-
             $futureOutEdgesNodeIds = array();
-            $sirTrevorData = json_decode($value);
 
-            foreach ($sirTrevorData->data as $block) {
-                $futureOutEdgesNodeIds[] = $block->data->node_id;
+            if (empty($value)) {
+                Yii::log("$name was empty so all related items will be removed", 'info', __METHOD__);
+            } else {
+                $sirTrevorData = json_decode($value);
+                foreach ($sirTrevorData->data as $block) {
+                    $futureOutEdgesNodeIds[] = $block->data->node_id;
+                }
             }
 
             $this->owner->setOutEdges($futureOutEdgesNodeIds, $this->virtualToActualAttribute($name));
