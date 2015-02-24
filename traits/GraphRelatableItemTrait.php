@@ -9,11 +9,21 @@
 trait GraphRelatableItemTrait
 {
 
+    public function graphRelatableItemBaseRelations()
+    {
+        return array(
+            'outEdges' => array(CActiveRecord::HAS_MANY, 'Edge', array('id' => 'from_node_id'), 'through' => 'node'),
+            'outNodes' => array(CActiveRecord::HAS_MANY, 'Node', array('to_node_id' => 'id'), 'through' => 'outEdges'),
+            'inEdges' => array(CActiveRecord::HAS_MANY, 'Edge', array('id' => 'to_node_id'), 'through' => 'node'),
+            'inNodes' => array(CActiveRecord::HAS_MANY, 'Node', array('from_node_id' => 'id'), 'through' => 'inEdges'),
+        );
+    }
+
     public function relationalGraphDbRelation($relationName, $modelClass)
     {
         return array(
             $relationName => array(
-                self::HAS_MANY,
+                CActiveRecord::HAS_MANY,
                 $modelClass,
                 array('id' => 'node_id'),
                 'through' => 'outNodes',
