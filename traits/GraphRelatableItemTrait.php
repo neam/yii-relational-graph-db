@@ -19,13 +19,24 @@ trait GraphRelatableItemTrait
         );
     }
 
-    public function relationalGraphDbRelation($relationName, $modelClass)
+    /**
+     * @param $relationName
+     * @param $modelClass Either a model class name or '*', indicating that any item type may be related
+     * @param string $refFk
+     * @return array
+     */
+    public function relationalGraphDbRelation($relationName, $modelClass, $refFk = 'node_id')
     {
+        // If we have no model class constraint, we need to relate only to the related items' nodes
+        if ($modelClass === '*' || $modelClass === 'Node') {
+            $modelClass = 'Node';
+            $refFk = 'id';
+        }
         return array(
             $relationName => array(
                 CActiveRecord::HAS_MANY,
                 $modelClass,
-                array('id' => 'node_id'),
+                array('id' => $refFk),
                 'through' => 'outNodes',
                 'condition' => 'relation = :relation',
                 'order' => 'outEdges.weight ASC',
@@ -36,23 +47,4 @@ trait GraphRelatableItemTrait
         );
     }
 
-    public function relationalGraphDbRelatedOutNodes()
-    {
-        $relationName = 'related';
-        return array(
-            $relationName => array(
-                CActiveRecord::HAS_MANY,
-                'Node',
-                array('id' => 'id'),
-                'through' => 'outNodes',
-                'condition' => 'relation=:relation',
-                'order' => 'outEdges.weight ASC',
-                'params' => array(
-                    ':relation' => $relationName
-                ),
-            )
-        );
-    }
-
-
-} 
+}
