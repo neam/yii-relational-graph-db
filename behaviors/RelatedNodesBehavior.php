@@ -69,15 +69,16 @@ class RelatedNodesBehavior extends CActiveRecordBehavior
         $node = $model->node();
 
         // array of models relation-names
-        $relationNames = array_keys($model->relations());
+        $relations = $model->relations();
+        $relationNames = array_keys($relations);
 
         // Relations considered safe. Note: set the relation as safe in the model-rules (if it is not already)!
         $allowedRelations = array_filter(
         // attribute-names posted from form
             array_keys($post),
-            // add to list if the attribute is a safe relation
-            function ($attribute) use ($model, $relationNames) {
-                return in_array($attribute, $relationNames) && $model->isAttributeSafe($attribute);
+            // add to list if the attribute is a safe relation that goes through the 'node' relation
+            function ($attribute) use ($model, $relations, $relationNames) {
+                return in_array($attribute, $relationNames) && $model->isAttributeSafe($attribute) && (isset($relations[$attribute]['through']) && $relations[$attribute]['through'] == 'node');
             }
         );
 
