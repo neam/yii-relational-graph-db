@@ -66,7 +66,7 @@ class RelatedNodesBehavior extends CActiveRecordBehavior
     {
 
         $model = $this->owner;
-        $node = $model->node();
+        $node = $model->ensureNode();
 
         // array of models relation-names
         $relations = $model->relations();
@@ -98,7 +98,7 @@ class RelatedNodesBehavior extends CActiveRecordBehavior
     {
 
         $model = $this->owner;
-        $node = $model->node();
+        $node = $model->ensureNode();
 
         $isFutureOutEdgesEmpty = empty($futureOutEdgesNodeIds);
 
@@ -145,7 +145,7 @@ class RelatedNodesBehavior extends CActiveRecordBehavior
         $criteria->addCondition('from_node_id = :from');
         $criteria->addCondition('relation = :relation');
         $criteria->addInCondition('to_node_id', $edgesToDelete);
-        $criteria->params[':from'] = $model->node()->id;
+        $criteria->params[':from'] = $model->ensureNode()->id;
         $criteria->params[':relation'] = $relationName;
 
         return Edge::model()->deleteAll($criteria);
