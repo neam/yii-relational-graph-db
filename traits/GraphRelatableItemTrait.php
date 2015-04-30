@@ -3,6 +3,11 @@
 /**
  * Trait GraphRelatableItemTrait
  *
+ * @property Edge[] $outEdges
+ * @property Node[] $outNodes
+ * @property Edge[] $inEdges
+ * @property Node[] $inNodes
+ *
  * @license BSD-3-Clause
  * @author See https://github.com/neam/yii-relational-graph-db/graphs/contributors
  */
