@@ -18,7 +18,7 @@
         }
     ],
     "autoload": {
-        "classmap": ["behaviors/"]
+        "classmap": ["behaviors/", "traits/"]
     },    
     "require": {
         "php": ">=5.4.0",
