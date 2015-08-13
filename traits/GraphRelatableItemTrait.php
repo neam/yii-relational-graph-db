@@ -61,7 +61,9 @@ trait GraphRelatableItemTrait
 
         if (is_null($this->node_id)) {
             $node = new Node();
-            $node->save();
+            if (!$node->save()) {
+                throw new SaveException($node);
+            }
             $this->node_id = $node->id;
             $this->save();
             $this->refresh();
