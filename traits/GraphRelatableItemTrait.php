@@ -69,6 +69,15 @@ trait GraphRelatableItemTrait
             $this->refresh();
         }
 
+        if (!($this->node instanceof Node)) {
+            throw new CException(
+                "Related node not available. \$this->node_id: {$this->node_id}, \$node: '" . print_r(
+                    $this->node,
+                    true
+                ) . "'"
+            );
+        }
+
         return $this->node;
 
     }
