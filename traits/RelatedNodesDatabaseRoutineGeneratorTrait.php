@@ -39,10 +39,8 @@ trait RelatedNodesDatabaseRoutineGeneratorTrait
                 }
 
                 if (!$dryRun) {
-                    $this->_db->createCommand($dropRoutineSql)->execute();
-                    //$this->_db->createCommand("DELIMITER $$")->execute();
-                    $this->_db->createCommand($createRoutineSql)->execute();
-                    //$this->_db->createCommand("DELIMITER ;")->execute();
+                    $this->_db->getPdoInstance()->exec($dropRoutineSql);
+                    $this->_db->getPdoInstance()->exec($createRoutineSql);
                 }
 
             }
