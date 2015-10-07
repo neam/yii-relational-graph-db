@@ -59,17 +59,22 @@ trait GraphRelatableItemTrait
     public function ensureNode()
     {
 
-        if (is_null($this->node_id)) {
+        $fakeNode = new Node();
+        $fakeNode->id = -1;
+        return $fakeNode;
+
+        if (is_null($this->getNodeId())) {
             $node = new Node();
             if (!$node->save()) {
                 throw new SaveException($node);
             }
-            $this->node_id = $node->id;
+            $this->node_id = $node->getId();
             $this->save();
             $this->refresh();
         }
 
-        if (!($this->node instanceof Node)) {
+        /*
+        if (!($this->getNode() instanceof Node)) {
             throw new CException(
                 "Related node not available. \$this->node_id: {$this->node_id}, \$node: '" . print_r(
                     $this->node,
@@ -77,8 +82,9 @@ trait GraphRelatableItemTrait
                 ) . "'"
             );
         }
+        */
 
-        return $this->node;
+        return $this->getNode();
 
     }
 
