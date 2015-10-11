@@ -58,6 +58,49 @@ trait GraphRelatableItemTrait
      */
     public function ensureNode()
     {
+        if ($this instanceof CActiveRecord) {
+            return $this->ensureNode_yii();
+        } else {
+            return $this->ensureNode_propel();
+        }
+    }
+
+    /**
+     * Ensures node relation - Yii 1 AR
+     * @return Node
+     */
+    public function ensureNode_yii()
+    {
+
+        if (is_null($this->node_id)) {
+            $node = new Node();
+            if (!$node->save()) {
+                throw new SaveException($node);
+            }
+            $this->node_id = $node->id;
+            $this->save();
+            $this->refresh();
+        }
+
+        if (!($this->node instanceof Node)) {
+            throw new CException(
+                "Related node not available. \$this->node_id: {$this->node_id}, \$node: '" . print_r(
+                    $this->node,
+                    true
+                ) . "'"
+            );
+        }
+
+        return $this->node;
+
+    }
+
+    /**
+     * Ensures node relation - Propel ORM
+     * @return Node
+     */
+    public function ensureNode_propel()
+    {
 
         $fakeNode = new Node();
         $fakeNode->id = -1;
